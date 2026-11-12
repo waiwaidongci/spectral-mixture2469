@@ -1,0 +1,1 @@
+export const number=(n:number|null|undefined,d=3)=>n==null?'不可估计':n.toLocaleString('zh-CN',{maximumFractionDigits:d,minimumFractionDigits:d});export const percent=(n:number)=>number(n*100,1)+'%';export const scientific=(n:number|null|undefined)=>n==null?'不可估计':n.toExponential(2);export const time=(s:string)=>new Date(s).toLocaleString('zh-CN',{hour12:false});

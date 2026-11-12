@@ -1,0 +1,1 @@
+import {request} from './client';import {Run} from '../types/domain';export const getRuns=()=>request<Run[]>('/runs');export const createRun=(data:{name:string;library_id:number;sample_ids:number[];noise_sigma:number;repeats:number;seed:number})=>request<Run>('/runs',{method:'POST',body:JSON.stringify(data)});

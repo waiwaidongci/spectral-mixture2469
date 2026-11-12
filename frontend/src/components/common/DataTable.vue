@@ -1,0 +1,1 @@
+<script setup lang="ts">defineProps<{head:string[]}>()</script><template><div class="table-wrap"><table><thead><tr><th v-for="h in head" :key="h">{{h}}</th></tr></thead><tbody><slot/></tbody></table></div></template>

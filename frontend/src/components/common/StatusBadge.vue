@@ -1,0 +1,1 @@
+<script setup lang="ts">import {RunStatus} from '../../constants/enums';defineProps<{status:string}>()</script><template><span :class="['status',status]"><i/>{{RunStatus[status as keyof typeof RunStatus]||status}}</span></template>

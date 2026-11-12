@@ -1,0 +1,1 @@
+import {ref} from 'vue';export function useAction(){const busy=ref(false),error=ref('');async function execute(action:()=>Promise<void>){busy.value=true;error.value='';try{await action()}catch(e){error.value=(e as Error).message}finally{busy.value=false}}return {busy,error,execute};}

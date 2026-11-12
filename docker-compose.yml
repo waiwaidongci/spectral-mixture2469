@@ -1,0 +1,73 @@
+name: ${COMPOSE_PROJECT_NAME:-spectral-mixture}
+services:
+  frontend:
+    container_name: ${COMPOSE_PROJECT_NAME:-spectral-mixture}-frontend
+    build: ./frontend
+    ports: ["${FRONTEND_PORT:-18223}:80"]
+    depends_on:
+      backend: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+  backend:
+    container_name: ${COMPOSE_PROJECT_NAME:-spectral-mixture}-backend
+    build: ./backend
+    environment: &backend-env
+      DATABASE_URL: mysql+pymysql://spectral:spectral@db/spectral?charset=utf8mb4
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: ${JWT_SECRET:-local-spectral-mixture-change-this-key}
+      SEED_DEMO: ${SEED_DEMO:-true}
+    ports: ["${BACKEND_PORT:-19223}:8000"]
+    volumes: ["artifacts:/artifacts"]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+  worker:
+    container_name: ${COMPOSE_PROJECT_NAME:-spectral-mixture}-worker
+    build: ./backend
+    command: ["python", "-m", "src.worker"]
+    environment: *backend-env
+    volumes: ["artifacts:/artifacts"]
+    depends_on:
+      backend: {condition: service_healthy}
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import pathlib,time; assert time.time()-float(pathlib.Path('/artifacts/heartbeat').read_text())<15"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+  db:
+    container_name: ${COMPOSE_PROJECT_NAME:-spectral-mixture}-db
+    image: mysql:8.0
+    environment: {MYSQL_DATABASE: spectral, MYSQL_USER: spectral, MYSQL_PASSWORD: spectral, MYSQL_ROOT_PASSWORD: local-spectral-root}
+    ports: ["${DB_PORT:-17723}:3306"]
+    volumes: ["db-data:/var/lib/mysql"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+  redis:
+    container_name: ${COMPOSE_PROJECT_NAME:-spectral-mixture}-redis
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["redis-data:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  db-data:
+  redis-data:
+  artifacts:

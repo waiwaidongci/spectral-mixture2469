@@ -1,0 +1,1 @@
+import {onMounted,onUnmounted} from 'vue';import {useResearch} from '../stores/research';export function useResearchData(poll=false){const s=useResearch();let timer:ReturnType<typeof setInterval>|undefined;onMounted(()=>{s.refresh();if(poll)timer=setInterval(s.refresh,2000)});onUnmounted(()=>{if(timer)clearInterval(timer)});return s;}

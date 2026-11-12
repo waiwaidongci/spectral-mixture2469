@@ -1,0 +1,1 @@
+import {request} from './client';import {Sample} from '../types/domain';export const getSamples=(id:number)=>request<Sample[]>(`/libraries/${id}/samples`);export const annotateSample=(id:number,note:string)=>request(`/samples/${id}`,{method:'PATCH',body:JSON.stringify({note})});

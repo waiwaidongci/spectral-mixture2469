@@ -1,0 +1,10 @@
+export interface User{name:string;email:string;role:string}
+export interface Library{id:number;code:string;name:string;description:string;wavelengths:number[];source:string;endmember_count:number;sample_count:number;supported:boolean;condition_number:number|null;reason:string}
+export interface Endmember{id:number;library_id:number;code:string;name:string;spectrum:number[]}
+export interface Sample{id:number;code:string;library_id:number;name:string;observed:number[];note:string}
+export interface Fit{weights:number[];reconstructed:number[];residual:number[];rss:number;rmse:number;active_count:number;equality_error:number;active_stationarity_error:number;inactive_slack_min:number|null;kkt_tolerance:number;supports_solved:number}
+export interface SampleResult{sample_id:number;code:string;name:string;observed:number[];spawn_key:number[];high_residual:boolean;point_fit:Fit;replicate_weights:number[][];replicate_rss:number[];lower:number[];median:number[];upper:number[];noise_sigma:number;repeats:number;degenerate_noise:boolean;interval_note:string}
+export interface Result{library:Library;endmembers:Endmember[];samples:SampleResult[];diagnostics:{augmented_rank:number;condition_number:number;condition_limit:number;supported:boolean;reason:string};noise_sigma:number;repeats:number;seed:number;input_hash:string;assumptions:string;quantile_note:string;feasibility_tolerance:number;condition_limit:number}
+export interface Run{id:number;name:string;library_id:number;sample_ids:number[];noise_sigma:number;repeats:number;seed:number;status:string;result:Result;error:string;owner:string;created_at:string}
+export interface Note{id:number;run_id:number;title:string;interpretation:string;proposal:string;status:string;owner:string;reviewer:string;review_note:string;created_at:string}
+export interface Audit{id:number;actor:string;action:string;target:string;created_at:string}
